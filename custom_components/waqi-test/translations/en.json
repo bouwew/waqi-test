@@ -11,6 +11,10 @@
           }
         }
       },
+      "pick_station": {
+        "title": "Stations found",
+        "description": "Please select a station:"
+      },
       "error": {
         "no_matching_stations_found": "No matching stations found",
         "api_over_quota": "Too many API-requests",

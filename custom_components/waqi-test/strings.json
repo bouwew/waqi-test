@@ -1,0 +1,24 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "title": "WAQI configuration",
+          "description": "Please enter:",
+          "data": {
+            "api_token": "API token",
+            "keyword": "Search string",
+            "update_interval": "Update interval"
+          }
+        }
+      },
+      "error": {
+        "no_matching_stations_found": "No matching stations found",
+        "api_over_quota": "Too many API-requests",
+        "api_token_invalid": "Invalid API-token",
+        "unknown": "[%key:common::config_flow::error::unknown%]"
+      },
+      "abort": {
+        "already_configured": "[%key:common::config_flow::abort::already_configured_service%]"
+      }
+    }
+}

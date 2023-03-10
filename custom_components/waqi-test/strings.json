@@ -2,21 +2,37 @@
     "config": {
       "step": {
         "user": {
-          "title": "WAQI configuration",
+          "title": "Configuration options",
+          "description": "Please select an option:",
+          "data": {}
+        },
+        "user_search": {
+          "title": "WAQI search configuration",
           "description": "Please enter:",
           "data": {
             "api_token": "API token",
             "keyword": "Search string",
             "update_interval": "Update interval"
           }
+        },
+        "pick_station": {
+          "title": "Stations found",
+          "description": "Please select a station:",
+          "data": {}
+        },
+        "user_feed": {
+          "title": "WAQI single station configuration",
+          "description": "Please enter:",
+          "data": {
+            "api_token": "API token",
+            "station": "Feed ID",
+            "update_interval": "Update interval"
+          }
         }
-      },
-      "pick_station": {
-        "title": "Stations found",
-        "description": "Please select a station:"
       },
       "error": {
         "no_matching_stations_found": "No matching stations found",
+        "no_station_feed_found": "No matching feed ID found",
         "api_over_quota": "Too many API-requests",
         "api_token_invalid": "Invalid API-token",
         "unknown": "[%key:common::config_flow::error::unknown%]"

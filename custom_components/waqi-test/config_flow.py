@@ -103,12 +103,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             default=user_input[CONF_API_TOKEN]
                         ): str,
                         vol.Required(
-                            CONF_KEYWORD),
+                            CONF_KEYWORD,
                             default=user_input[CONF_KEYWORD]
                         ): str,
                         vol.Optional(
                             CONF_UPDATE_INTERVAL,
-                            default=user_input[CONF_UPDATE_INTERVAL]),
+                            default=user_input[CONF_UPDATE_INTERVAL]
                         ): int,
                     }
                 ),
@@ -134,6 +134,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             unique_id = user_input[CONF_STATION]
+            LOGGER.debug("unique_id: %s", unique_id)
 
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
@@ -162,49 +163,73 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the feed step."""
         errors: dict[str, str] = {}
 
-        if user_input is not None:
-            try:
-                client = waqi.WAQIClient(
-                    user_input[CONF_API_TOKEN], async_get_clientsession(self.hass)
-                )
-                station = await client.feed(user_input[CONF_STATION])
-                LOGGER.debug("Station: %s", station)
-                if not station:
-                    errors[CONF_STATION] = "no_station_feed_found"
-            except waqi.OverQuota:
-                errors[CONF_API_TOKEN] = "api_over_quota"
-            except waqi.InvalidToken:
-                errors[CONF_API_TOKEN] = "api_token_invalid"
-            except:
-                return self.async_abort(reason="unknown")
-            else:
-                LOGGER.debug("Station data: %s", station)
-                unique_id = user_input[CONF_STATION]
-                await self.async_set_unique_id(unique_id)
-                self._abort_if_unique_id_configured()
-
-            return self.async_create_entry(
-                title=station["uid"],
-                data={},
-                options={
-                    CONF_API_TOKEN: user_input[CONF_API_TOKEN],
-                    CONF_UPDATE_INTERVAL: user_input[CONF_UPDATE_INTERVAL],
-                },
+        if not user_input:
+            return self.async_show_form(
+                step_id="user_feed",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONF_API_TOKEN): str,
+                        vol.Required(CONF_STATION): str,
+                        vol.Optional(
+                            CONF_UPDATE_INTERVAL,
+                            default=DEFAULT_UPDATE_INTERVAL,
+                        ): int,
+                    },
+                ),
+                errors=errors,
             )
 
-        return self.async_show_form(
-            step_id="user_feed",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_API_TOKEN): str,
-                    vol.Required(CONF_STATION): str,
-                    vol.Optional(
-                        CONF_UPDATE_INTERVAL,
-                        default=DEFAULT_UPDATE_INTERVAL,
-                    ): int,
-                },
-            ),
-            errors=errors,
+        try:
+            client = waqi.WAQIClient(
+                user_input[CONF_API_TOKEN], async_get_clientsession(self.hass)
+            )
+            station = await client.feed(user_input[CONF_STATION])
+            LOGGER.debug("Station: %s", station)
+            if not station:
+                errors[CONF_STATION] = "no_station_feed_found"
+        except waqi.OverQuota:
+            errors[CONF_API_TOKEN] = "api_over_quota"
+        except waqi.InvalidToken:
+            errors[CONF_API_TOKEN] = "api_token_invalid"
+        except Exception:
+            return self.async_abort(reason="unknown")
+
+        if errors:
+            return self.async_show_form(
+                step_id="user_feed",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_API_TOKEN,
+                            default=user_input[CONF_API_TOKEN]
+                        ): str,
+                        vol.Required(
+                            CONF_STATION,
+                            efault=user_input[CONF_STATION]
+                        ): str,
+                        vol.Optional(
+                            CONF_UPDATE_INTERVAL,
+                            default=user_input[CONF_UPDATE_INTERVAL]
+                        ): int,
+                    },
+                ),
+                errors=errors,
+            )
+
+        # LOGGER.debug("Station data: %s", station)
+        unique_id = user_input[CONF_STATION]
+        LOGGER.debug("unique_id: %s", unique_id)
+
+        await self.async_set_unique_id(unique_id)
+        self._abort_if_unique_id_configured()
+
+        return self.async_create_entry(
+            title=station["city"]["name"],
+            data={},
+            options={
+                CONF_API_TOKEN: user_input[CONF_API_TOKEN],
+                CONF_UPDATE_INTERVAL: user_input[CONF_UPDATE_INTERVAL],
+            },
         )
 
     @staticmethod

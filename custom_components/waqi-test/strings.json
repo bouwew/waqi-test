@@ -25,7 +25,7 @@
           "description": "Please enter:",
           "data": {
             "api_token": "API token",
-            "station": "Feed ID",
+            "station": "Feed ID (with @ or A as the first character)",
             "update_interval": "Update interval"
           }
         }

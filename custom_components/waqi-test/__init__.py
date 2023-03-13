@@ -31,7 +31,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def coordinator_async_get():
         try:
-            return await client.feed(f"@{entry.unique_id}")
+            return await client.feed(f"{entry.unique_id}")
         except e:
             raise UpdateFailed(e) from e
 

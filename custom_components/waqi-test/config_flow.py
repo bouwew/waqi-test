@@ -118,7 +118,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._stations = {}
         for station in found:
             LOGGER.debug("Station found: %s", station)
-            station_id = station["uid"]
+            temp_id = station["uid"]
+            station_id = f"@{temp_id}"
             self._stations[station_id] = station["station"]["name"]
 
         self._api_token = user_input[CONF_API_TOKEN]
@@ -205,7 +206,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         ): str,
                         vol.Required(
                             CONF_STATION,
-                            efault=user_input[CONF_STATION]
+                            default=user_input[CONF_STATION]
                         ): str,
                         vol.Optional(
                             CONF_UPDATE_INTERVAL,
